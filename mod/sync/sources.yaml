@@ -1,0 +1,27 @@
+source:
+  repository: avgustvishne/CDN-Cloud-MagiTrickle
+  branch: main
+  manifest: data/manifest.json
+  checksums: data/checksums.sha256
+  presets:
+    full:
+      ipv4: data/presets/full-v4.txt
+      ipv6: data/presets/full-v6.txt
+    balanced:
+      ipv4: data/presets/balanced-v4.txt
+      ipv6: data/presets/balanced-v6.txt
+    minimal:
+      ipv4: data/presets/minimal-v4.txt
+      ipv6: data/presets/minimal-v6.txt
+    cloud:
+      ipv4: data/presets/cloud-v4.txt
+      ipv6: data/presets/cloud-v6.txt
+    cdn:
+      ipv4: data/presets/cdn-v4.txt
+      ipv6: data/presets/cdn-v6.txt
+    video:
+      ipv4: data/presets/video-v4.txt
+      ipv6: data/presets/video-v6.txt
+    vpn:
+      ipv4: data/presets/vpn-v4.txt
+      ipv6: data/presets/vpn-v6.txt
