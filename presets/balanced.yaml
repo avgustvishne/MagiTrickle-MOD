@@ -1,0 +1,11 @@
+name: balanced
+description: Recommended N60 Pro profile
+features:
+  domains: true
+  cidr: true
+  asn: true
+  cdn: true
+  fallback: true
+optimization:
+  deduplicate: true
+  normalize: true
