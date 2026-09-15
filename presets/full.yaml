@@ -1,0 +1,8 @@
+name: full
+description: Maximum coverage
+features:
+  domains: true
+  cidr: true
+  asn: true
+  cdn: true
+  fallback: true
