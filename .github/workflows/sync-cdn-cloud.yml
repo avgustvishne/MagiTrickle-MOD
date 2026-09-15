@@ -1,0 +1,85 @@
+name: Sync CDN-Cloud-MagiTrickle
+
+on:
+  schedule:
+    - cron: "37 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "Profile to validate"
+        required: true
+        default: balanced
+        type: choice
+        options:
+          - full
+          - balanced
+          - minimal
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cdn-cloud-sync
+  cancel-in-progress: true
+
+jobs:
+  sync-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch source manifest
+        env:
+          PROFILE: ${{ inputs.profile || 'balanced' }}
+        run: |
+          set -eu
+          mkdir -p .sync
+          curl -fsSL --retry 5 --connect-timeout 10 --max-time 30             https://raw.githubusercontent.com/avgustvishne/CDN-Cloud-MagiTrickle/main/data/manifest.json             -o .sync/manifest.json
+          curl -fsSL --retry 5 --connect-timeout 10 --max-time 30             https://raw.githubusercontent.com/avgustvishne/CDN-Cloud-MagiTrickle/main/data/checksums.sha256             -o .sync/checksums.sha256
+
+      - name: Validate manifest
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path(".sync/manifest.json").read_text())
+          required={"version","updated","engine","features","providers","aggregate"}
+          missing=required-set(m)
+          if missing:
+              raise SystemExit(f"Missing manifest keys: {sorted(missing)}")
+          if not isinstance(m["version"], int):
+              raise SystemExit("Manifest version is not integer")
+          print("Engine:",m["engine"])
+          print("Version:",m["version"])
+          print("Updated:",m["updated"])
+          print("Features:",", ".join(m["features"]))
+          print("Aggregate:",m["aggregate"])
+          PY
+
+      - name: Validate selected dataset
+        env:
+          PROFILE: ${{ inputs.profile || 'balanced' }}
+        run: |
+          set -eu
+          case "$PROFILE" in
+            full) f4=data/presets/full-v4.txt; f6=data/presets/full-v6.txt ;;
+            balanced) f4=data/presets/balanced-v4.txt; f6=data/presets/balanced-v6.txt ;;
+            minimal) f4=data/presets/minimal-v4.txt; f6=data/presets/minimal-v6.txt ;;
+            *) echo "Unknown profile"; exit 2 ;;
+          esac
+          for f in "$f4" "$f6"; do
+            url="https://raw.githubusercontent.com/avgustvishne/CDN-Cloud-MagiTrickle/main/$f"
+            curl -fsSL --retry 5 --connect-timeout 10 --max-time 30 "$url" -o ".sync/$(basename "$f")"
+            test -s ".sync/$(basename "$f")"
+            if grep -qiE '<html|<!doctype' ".sync/$(basename "$f")"; then
+              echo "HTML returned instead of dataset: $f"
+              exit 1
+            fi
+            echo "$f: $(wc -l < ".sync/$(basename "$f")") lines"
+          done
+
+      - name: Verify source checksum entries exist
+        run: |
+          grep -E 'full-v4.txt|balanced-v4.txt|minimal-v4.txt' .sync/checksums.sha256 >/dev/null
+          echo "Checksum registry contains profile datasets"
