@@ -1,0 +1,14 @@
+profile: n60-pro
+provider:
+  repository: avgustvishne/CDN-Cloud-MagiTrickle
+  channel: stable
+  default_dataset: balanced
+sync:
+  interval: 6h
+  retries: 5
+  timeout_seconds: 30
+  cache_ttl_seconds: 21600
+runtime:
+  keep_last_good: true
+  atomic_replace: true
+  rollback_on_validation_error: true
