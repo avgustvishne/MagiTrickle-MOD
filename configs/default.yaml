@@ -1,0 +1,17 @@
+profile: balanced
+
+providers:
+  auto_update: true
+  interval: 6h
+  timeout: 30s
+  retries: 3
+
+validation:
+  reject_empty: true
+  reject_html: true
+  keep_last_good: true
+
+mihomo:
+  enabled: true
+  auto_reload: true
+  controller: 127.0.0.1:9090
