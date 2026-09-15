@@ -1,0 +1,26 @@
+name: MagiTrickle-MOD CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate repository
+        run: |
+          test -f VERSION
+          test -f mod/n60-pro/profile.yaml
+          test -f mod/providers/cdn-cloud.yaml
+          test -f mod-config/full.yaml
+          test -f mod-config/balanced.yaml
+          test -f mod-config/minimal.yaml
+          chmod +x scripts/*.sh
+          ./scripts/mod-validate.sh
