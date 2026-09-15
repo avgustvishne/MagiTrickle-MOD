@@ -1,0 +1,19 @@
+providers:
+  - id: cdn-cloud-magitrickle
+    name: CDN-Cloud-MagiTrickle
+    type: github
+    repository: avgustvishne/CDN-Cloud-MagiTrickle
+    enabled: true
+    profiles:
+      - full
+      - balanced
+      - minimal
+    update:
+      interval: 6h
+      timeout: 30s
+      retries: 3
+    validation:
+      reject_empty: true
+      reject_html: true
+      min_entries: 10
+      keep_last_good: true
