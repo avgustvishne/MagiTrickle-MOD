@@ -1,0 +1,11 @@
+name: minimal
+description: Lowest rule/storage footprint
+features:
+  domains: true
+  cidr: true
+  asn: false
+  cdn: true
+  fallback: true
+optimization:
+  deduplicate: true
+  normalize: true
