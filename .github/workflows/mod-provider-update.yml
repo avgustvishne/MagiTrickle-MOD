@@ -1,0 +1,52 @@
+name: MOD Provider Update
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+  push:
+    paths:
+      - "mod/providers/**"
+      - "mod/subscriptions/**"
+      - "mod-config/**"
+      - ".github/workflows/mod-provider-update.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: magitrickle-mod-provider-update
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check CDN-Cloud-MagiTrickle
+        run: |
+          set -eu
+          python - <<'PY'
+          import urllib.request
+          url="https://raw.githubusercontent.com/avgustvishne/CDN-Cloud-MagiTrickle/main/README.md"
+          with urllib.request.urlopen(url, timeout=20) as r:
+              data=r.read()
+          assert data, "empty provider source"
+          print("CDN-Cloud-MagiTrickle reachable:", len(data), "bytes")
+          PY
+      - name: Validate MOD configuration
+        run: |
+          chmod +x scripts/mod-validate.sh
+          ./scripts/mod-validate.sh
+      - name: Commit metadata changes if any
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mod mod-config docs VERSION
+          if git diff --cached --quiet; then
+            echo "No generated changes."
+          else
+            git commit -m "chore: update MOD provider metadata"
+            git push
+          fi
