@@ -1,0 +1,9 @@
+id: cdn-cloud-magitrickle
+name: CDN-Cloud-MagiTrickle
+repository: avgustvishne/CDN-Cloud-MagiTrickle
+type: github
+enabled: true
+profiles:
+  - full
+  - balanced
+  - minimal
