@@ -1,0 +1,21 @@
+schema: 1
+provider_repository: avgustvishne/CDN-Cloud-MagiTrickle
+manifest_path: data/manifest.json
+required:
+  - version
+  - updated
+  - engine
+  - features
+  - providers
+  - aggregate
+validation:
+  checksum: sha256
+  reject_empty: true
+  reject_html: true
+  keep_last_good: true
+  max_provider_prefixes: 50000
+  max_aggregate_prefixes: 200000
+profiles:
+  full: data/presets/full-v4.txt
+  balanced: data/presets/balanced-v4.txt
+  minimal: data/presets/minimal-v4.txt
