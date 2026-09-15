@@ -1,0 +1,8 @@
+generated/
+build/
+dist/
+*.ipk
+*.apk
+*.tar.gz
+*.tmp
+.cache/
